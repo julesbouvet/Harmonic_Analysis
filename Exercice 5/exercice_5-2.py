@@ -27,9 +27,10 @@ def dft(t, f, N, fig_name):
 
     yf = np.fft.fft(f)
     sp = np.abs(yf)
-    freq = np.fft.fftfreq(t.shape[0])
+    freq = np.fft.fftfreq(N)*N
     plt.subplot(1, 3, 2)
     plt.plot(freq, sp)
+    plt.xlim((-105, 105))
 
     phase = np.angle(yf)
     plt.subplot(1, 3, 3)
@@ -43,9 +44,9 @@ def filtering(t, f):
     yf = np.fft.fft(f)
     h = 1/(1+1j/100)
     filtered_yf = np.convolve(yf, h)
-    filtered_f = np.fft.ifft(np.abs(filtered_yf))
+    filtered_f = np.fft.ifft(filtered_yf)
 
-    plt.plot(t, filtered_f)
+    plt.plot(t, filtered_f.real, t, filtered_f.imag)
     plt.show()
 
 
