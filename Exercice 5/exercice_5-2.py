@@ -40,13 +40,21 @@ def dft(t, f, N, fig_name):
     return yf
 
 
-def filtering(t, f):
-    yf = np.fft.fft(f)
-    h = 1/(1+1j/100)
-    filtered_yf = np.convolve(yf, h)
-    filtered_f = np.fft.ifft(filtered_yf)
+def filtering(N, signal):
+    signal_fft = np.fft.fft(signal)
+    sample_freq = np.fft.fftfreq(N) * N
 
-    plt.plot(t, filtered_f.real, t, filtered_f.imag)
+    # Find the peak frequency: we can focus on only the positive frequencies
+    pos_mask = np.where(sample_freq > 0)
+    freqs = sample_freq[pos_mask]
+    peak_freq = freqs[signal_fft[pos_mask].argmax()]
+
+    high_freq_fft = signal_fft.copy()
+    high_freq_fft[np.abs(sample_freq) >= peak_freq-10] = 0
+    filtered_sig = np.fft.ifft(high_freq_fft)
+
+    plt.plot(sample_freq, signal.real)
+    plt.plot(sample_freq, filtered_sig.real)
     plt.show()
 
 
@@ -69,11 +77,13 @@ if __name__ == "__main__":
     t5, f5 = add_linear(t3, f3)
 
     # Question (ii)
-    num = 1
-    for (t, f) in [(t1, f1), (t2, f2), (t3, f3), (t4, f4), (t5, f5)]:
-        name_signal = f'Analysis of signal f{num}'
-        dft(t, f, N, name_signal)
-        num += 1
+    question_2 = False
+    if question_2:
+        num = 1
+        for (t, f) in [(t1, f1), (t2, f2), (t3, f3), (t4, f4), (t5, f5)]:
+            name_signal = f'Analysis of signal f{num}'
+            dft(t, f, N, name_signal)
+            num += 1
 
     # Question (iii)
-    filtering(t3, f3)
+    filtering(N, f3)
